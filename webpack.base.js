@@ -14,9 +14,6 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        include: [
-          path.resolve(__dirname, "node_modules/casbin/lib/esm"),
-        ],
         use: {
           loader: 'babel-loader',
           options: {
@@ -30,14 +27,11 @@ module.exports = {
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
-  node: {
-    fs: "empty"
-  },
 
   output: {
-    library: 'casbin',
+    library: 'vue-casbin',
     libraryTarget: 'umd',
-    filename: 'casbin.js',
+    filename: 'vue-casbin.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
