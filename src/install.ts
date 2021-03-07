@@ -22,7 +22,7 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
 
     app.provide(AUTHORIZER_KEY, authorizer);
 
-    if (!authorizer) {
+    if (!authorizer || !(authorizer instanceof Authorizer)) {
         throw new Error('Please provide an authorizer instance to plugin.');
     }
 

@@ -3,8 +3,8 @@ import { Authorizer } from 'casbin.js';
 
 const AUTHORIZER_KEY: InjectionKey<Authorizer> = Symbol('casbinjs_authorizer');
 
-const useAuthorizer = function (): Authorizer {
-    const authorizer = inject(AUTHORIZER_KEY);
+const useAuthorizer = function <T extends Authorizer = Authorizer>(): T {
+    const authorizer = inject<T>(AUTHORIZER_KEY);
 
     if (!authorizer) {
         throw new Error("Cannot inject Authorizer instance because it didn't exist");

@@ -30,7 +30,7 @@ module.exports = {
 
   output: {
     library: 'vue-casbin',
-    libraryTarget: 'umd',
+    libraryTarget: 'module',
     filename: 'vue-casbin.js',
     path: path.resolve(__dirname, 'dist'),
   },
