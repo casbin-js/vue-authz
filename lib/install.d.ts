@@ -1,4 +1,8 @@
 import { App } from 'vue';
 import { Authorizer } from 'casbin.js';
-declare const install: (app: App, authorizer: Authorizer, options?: any) => void;
+export interface CasbinPluginOptions {
+    useGlobalProperties?: boolean;
+    customProperties?: Array<String>;
+}
+declare const install: (app: App, authorizer: Authorizer, options?: CasbinPluginOptions | undefined) => void;
 export { install };
