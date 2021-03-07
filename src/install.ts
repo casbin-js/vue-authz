@@ -1,8 +1,14 @@
 import { App } from 'vue';
 import { Authorizer } from 'casbin.js';
+import { AUTHORIZER_KEY } from './useAuthorizer';
 
-const install = function (app: App, authorizer: Authorizer, options?: any) {
-    let availableProperties = [
+export interface CasbinPluginOptions {
+    useGlobalProperties?: boolean;
+    customProperties?: Array<String>;
+}
+
+const install = function (app: App, authorizer: Authorizer, options?: CasbinPluginOptions) {
+    const availableProperties = [
         'getPermission',
         'setPermission',
         'initEnforcer',
@@ -13,11 +19,18 @@ const install = function (app: App, authorizer: Authorizer, options?: any) {
         'canAll',
         'canAny',
     ];
+
+    app.provide(AUTHORIZER_KEY, authorizer);
+
+    if (!authorizer) {
+        throw new Error('Please provide an authorizer instance to plugin.');
+    }
+
     if (options) {
         // I cannot implement this because of the limitation of Vue.
         // If you have any idea, plz tell me.
         //
-        // TODO: allow autoload when Authorizer in 'auto' mode is given.
+        // TODO: add autoload option when Authorizer in 'auto' mode is given.
         //
         // if (options.autoload) {
         //   if (authorizer.mode!=='auto'){
@@ -31,14 +44,10 @@ const install = function (app: App, authorizer: Authorizer, options?: any) {
         //   authorizer.setUser(options.autoload)
         // }
 
-        if (options.useGlobalProperties) {
+        if (!!options.useGlobalProperties) {
             app.config.globalProperties.$authorizer = authorizer;
 
-            if (options.customProperties) {
-                if (!(options.customProperties instanceof Array)) {
-                    throw new Error('customProperties must be an array.');
-                }
-
+            if (!!options.customProperties) {
                 const targetProperties = availableProperties.filter((property: string) => {
                     return (options.customProperties as Array<String>).indexOf(property) !== -1;
                 });
