@@ -4,7 +4,7 @@ import { AUTHORIZER_KEY } from './useAuthorizer';
 
 export interface CasbinPluginOptions {
     useGlobalProperties?: boolean;
-    customProperties?: Array<String>;
+    customProperties?: Array<string>;
 }
 
 const install = function (app: App, authorizer: Authorizer, options?: CasbinPluginOptions) {
@@ -44,12 +44,12 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
         //   authorizer.setUser(options.autoload)
         // }
 
-        if (!!options.useGlobalProperties) {
+        if (options.useGlobalProperties) {
             app.config.globalProperties.$authorizer = authorizer;
 
-            if (!!options.customProperties) {
+            if (options.customProperties) {
                 const targetProperties = availableProperties.filter((property: string) => {
-                    return (options.customProperties as Array<String>).indexOf(property) !== -1;
+                    return (options.customProperties as Array<string>).indexOf(property) !== -1;
                 });
 
                 targetProperties.forEach((propertyStr: string) => {
