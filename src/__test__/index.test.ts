@@ -80,4 +80,32 @@ describe('Enforcer plugin test', () => {
             expect(vm.authorizer).toEqual(authorizer);
         });
     });
+
+    describe('when use customProperties option', () => {
+        function addCustomApp(apiInNeed: string[]) {
+            app = createApp(App).use(plugin, authorizer, {
+                useGlobalProperties: true,
+                customProperties: apiInNeed,
+            });
+            vm = app.mount(appRoot);
+        }
+
+        it("should have 'can' and 'cannot'", function() {
+            addCustomApp(['can','cannot'])
+
+            expect(vm.$can).toBeDefined()
+            expect(vm.$cannot).toBeDefined()
+            expect(vm.$authorizer).toBeDefined()
+        });
+
+        it("should have 'can', 'cannot', 'canAll' and 'canAny'", function() {
+            addCustomApp(['can','cannot','canAll','canAny'])
+
+            expect(vm.$can).toBeDefined()
+            expect(vm.$cannot).toBeDefined()
+            expect(vm.$canAll).toBeDefined()
+            expect(vm.$canAny).toBeDefined()
+            expect(vm.$authorizer).toBeDefined()
+        });
+    });
 });
