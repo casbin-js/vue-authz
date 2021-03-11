@@ -56,7 +56,7 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
 
                     const property = Object.getPrototypeOf(authorizer)[propertyStr]
                     if (property) {
-                        let propertyKey:string = `$${propertyStr}`
+                        const propertyKey = `$${propertyStr}`
                         // app.config.globalProperties[propertyKey] = property;
                         Object.defineProperty(app.config.globalProperties,propertyKey,{
                             enumerable: true,
