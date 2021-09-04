@@ -1,4 +1,4 @@
-import { newEnforcer } from 'casbin.js';
+import { newEnforcer, MemoryAdapter } from 'casbin.js';
 import { defineComponent, createApp } from 'vue';
 import { AUTHORIZER_KEY, useAuthorizer } from '../useAuthorizer';
 import { basicModelStr } from './util';
@@ -32,7 +32,7 @@ describe('Enforcer plugin test', () => {
     });
 
     beforeEach(async () => {
-        let a = new StringAdapter("p, alice, data1, read\n" +
+        const a = new MemoryAdapter("p, alice, data1, read\n" +
             "p, alice, data2, read\n" +
             "p, alice, data2, write\n" +
             "p, bob, data2, write")

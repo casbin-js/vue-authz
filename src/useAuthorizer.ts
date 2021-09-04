@@ -7,7 +7,7 @@ const useAuthorizer = function <T extends Enforcer = Enforcer>(): T {
     const enforcer = inject<T>(AUTHORIZER_KEY);
 
     if (!enforcer) {
-        throw new Error("Cannot inject Authorizer instance because it didn't exist");
+        throw new Error("Cannot inject enforcer instance because it didn't exist");
     }
 
     return enforcer;
