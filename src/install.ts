@@ -13,8 +13,6 @@ const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOp
             useGlobalProperties: false,
         }
     }
-
-
     const availableProperties = [
         'addPolicy',
         'removePolicy',
