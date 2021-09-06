@@ -20,17 +20,19 @@ new [Vue Composition API](https://v3.vuejs.org/guide/composition-api-introductio
 
 ### The plugin
 
+First, you need to use MemoryAdapter to load your policy, Create an instance of newEnforcer at the same time,
+And use them in Vue
 ```typescript
 import { createApp } from 'vue';
-import CasbinPlugin from 'vue-authz';
-import { newEnforcer, MemoryAdapter } from 'casbin.js';
+import App from './App.vue';
+import useAuthorizer  from "vue-authz"
+import { MemoryAdapter, newEnforcer } from 'casbin.js';
 
 const a = new MemoryAdapter("p, alice, data1, read\n" +
     "p, alice, data2, read\n" +
     "p, alice, data2, write\n" +
     "p, bob, data2, write")
-
-enforcer = await newEnforcer("[request_definition]\n" +
+const enforcer = new newEnforcer("[request_definition]\n" +
     "r = sub, obj, act\n" +
     "\n" +
     "[policy_definition]\n" +
@@ -40,14 +42,10 @@ enforcer = await newEnforcer("[request_definition]\n" +
     "e = some(where (p.eft == allow))\n" +
     "\n" +
     "[matchers]\n" +
-    "m = r.sub == p.sub && r.obj == p.obj && r.act == p.act");
+    "m = r.sub == p.sub && r.obj == p.obj && r.act == p.act", a);
+App.use(useAuthorizer,enforcer)
 
-const enforce = new casbinjs.enforcer.enforce("alice", "data1", "read");
-
-createApp()
-    .use(CasbinPlugin, enforce, {
-        useGlobalProperties: true
-    }).mount('#app');
+createApp(App).mount('#app');
 ```
 
 After that, you can use `$enforce` in every component.
@@ -55,7 +53,7 @@ After that, you can use `$enforce` in every component.
 ```vue
 
 <template>
-    <p v-if="$whatyouwant.enforce('alice', 'data2', 'write')">
+    <p v-if="$enforce('alice', 'data2', 'write')">
         Post content.
     </p>
 </template>
@@ -90,7 +88,7 @@ export default {
 </script>
 ```
 
-You can also use `enforce` function.
+You can also use `useAuthorizer` function.
 
 ```vue
 

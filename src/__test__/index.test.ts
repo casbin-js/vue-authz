@@ -3,7 +3,6 @@ import { defineComponent, createApp } from 'vue';
 import { AUTHORIZER_KEY, useAuthorizer } from '../useAuthorizer';
 import { basicModelStr } from './util';
 import plugin from '../index';
-import { StringAdapter } from 'casbin';
 
 const respData = JSON.stringify({
     m: basicModelStr,
