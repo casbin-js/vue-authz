@@ -67,6 +67,29 @@ createApp()
     .mount('#app');
 ```
 
+And, you can use `$enforce.add` in every component. If you don't make custom settings, you can easily use addpolicy and addpolicies at the same time
+
+```vue
+
+<template>
+    <p v-if="$enforce.add('alice', 'data2', 'write')">
+        Post content.
+    </p>
+    and
+    <p v-if="$enforce.add([['alice', 'data1', 'read'],['alice', 'data2', 'write']])">
+        Post content.
+    </p>
+</template>
+```
+
+`useGlobalProperties` will mount `$enforce` on every component
+
+```typescript
+createApp()
+    .use(CasbinPlugin, enforce)
+    .mount('#app');
+```
+
 And inject it with `AUTHORIZER_KEY`
 
 ```vue

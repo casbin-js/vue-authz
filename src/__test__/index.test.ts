@@ -85,6 +85,7 @@ describe('Enforcer plugin test', () => {
 
         it('should have globalProperties', () => {
             expect(vm.$enforce).toBeDefined();
+            expect(vm.$enforce.add(['alice', 'data2', 'write'])).toBeDefined();
         });
 
         it('should have enforcer', function () {

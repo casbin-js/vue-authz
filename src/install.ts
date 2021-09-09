@@ -16,7 +16,8 @@ const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOp
     const availableProperties = [
         'addPolicy',
         'removePolicy',
-        'enforceEx'
+        'enforceEx',
+        'updatePolicy'
     ];
 
     app.provide(AUTHORIZER_KEY, enforcer);
@@ -51,6 +52,21 @@ const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOp
                 });
             } else {
                 app.config.globalProperties.$enforce = enforcer.enforce;
+                app.config.globalProperties.$enforce.add = async function (p){
+                    if(typeof p[0] === 'string'){
+                        return await enforcer.addPolicy(...p);
+                    }
+                    return await enforcer.addPolicies(p);
+                }
+                app.config.globalProperties.$enforce.remove = async function (p){
+                    if(typeof p[0] === 'string'){
+                        return await enforcer.removePolicy(...p);
+                    }
+                    return await enforcer.removePolicies(p);
+                }
+                app.config.globalProperties.$enforce.update = async function (oldp,newp){
+                        return await enforcer.updatePolicy(oldp,newp);
+                }
             }
         }
     }
