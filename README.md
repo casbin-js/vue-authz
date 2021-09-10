@@ -20,47 +20,73 @@ new [Vue Composition API](https://v3.vuejs.org/guide/composition-api-introductio
 
 ### The plugin
 
+First, you need to use MemoryAdapter to load your policy, Create an instance of newEnforcer at the same time,
+And use them in Vue
 ```typescript
 import { createApp } from 'vue';
-import CasbinPlugin from 'vue-authz';
-import { Authorizer } from 'casbin.js';
+import App from './App.vue';
+import useAuthorizer  from "vue-authz"
+import { MemoryAdapter, newEnforcer } from 'casbin.js';
 
-const permission = {
-    "read": ['data1', 'data2'],
-    "write": ['data1']
-}
+const a = new MemoryAdapter("p, alice, data1, read\n" +
+    "p, alice, data2, read\n" +
+    "p, alice, data2, write\n" +
+    "p, bob, data2, write")
+const enforcer = new newEnforcer("[request_definition]\n" +
+    "r = sub, obj, act\n" +
+    "\n" +
+    "[policy_definition]\n" +
+    "p = sub, obj, act\n" +
+    "\n" +
+    "[policy_effect]\n" +
+    "e = some(where (p.eft == allow))\n" +
+    "\n" +
+    "[matchers]\n" +
+    "m = r.sub == p.sub && r.obj == p.obj && r.act == p.act", a);
+App.use(useAuthorizer,enforcer)
 
-// Run casbin.js in manual mode, which requires you to set the permission manually.
-const authorizer = new casbinjs.Authorizer("manual");
-
-authorizer.setPermission(permission);
-
-createApp()
-    .use(CasbinPlugin, authorizer, {
-        useGlobalProperties: true
-    }).mount('#app');
+createApp(App).mount('#app');
 ```
 
-After that, you can use `$authorizer` and `$can` in every component.
+After that, you can use `$enforce` in every component.
 
 ```vue
 
 <template>
-    <p
-        v-if='$can("read","post")'
-    >
+    <p v-if="$enforce('alice', 'data2', 'write')">
         Post content.
     </p>
 </template>
 ```
 
-`useGlobalProperties` will mount `$can` and `$authorizer` on every component. Sometimes, you may want to use some other
-function as `$can`. In this condition, you can
-use [provide/inject API](https://v3.vuejs.org/guide/component-provide-inject.html) in Vue 3 to get the `$authorizer`.
+`useGlobalProperties` will mount `$enforce` on every component
 
 ```typescript
 createApp()
-    .use(CasbinPlugin, authorizer)
+    .use(CasbinPlugin, enforce)
+    .mount('#app');
+```
+
+And, you can use `$enforce.add` in every component. If you don't make custom settings, you can easily use addpolicy and addpolicies at the same time
+
+```vue
+
+<template>
+    <p v-if="$enforce.add('alice', 'data2', 'write')">
+        Post content.
+    </p>
+    and
+    <p v-if="$enforce.add([['alice', 'data1', 'read'],['alice', 'data2', 'write']])">
+        Post content.
+    </p>
+</template>
+```
+
+`useGlobalProperties` will mount `$enforce` on every component
+
+```typescript
+createApp()
+    .use(CasbinPlugin, enforce)
     .mount('#app');
 ```
 
@@ -69,7 +95,7 @@ And inject it with `AUTHORIZER_KEY`
 ```vue
 
 <template>
-    <p v-if="$whatyouwant.can('read', 'Post')">
+    <p v-if="$whatyouwant.enforce('alice', 'data2', 'write')">
         Post content.
     </p>
 </template>
@@ -90,7 +116,7 @@ You can also use `useAuthorizer` function.
 ```vue
 
 <template>
-    <p v-if="whatyouwant.can('read', 'Post')">
+    <p v-if="whatyouwant.enforce('alice', 'data2', 'write')">
         Post content.
     </p>
 </template>

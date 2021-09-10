@@ -1,5 +1,5 @@
 import { App } from 'vue';
-import { Authorizer } from 'casbin.js';
+import { Enforcer, newEnforcer} from 'casbin.js';
 import { AUTHORIZER_KEY } from './useAuthorizer';
 
 export interface CasbinPluginOptions {
@@ -7,45 +7,28 @@ export interface CasbinPluginOptions {
     customProperties?: Array<string>;
 }
 
-const install = function (app: App, authorizer: Authorizer, options?: CasbinPluginOptions) {
+const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOptions) {
+    if (options == undefined){
+        options = {
+            useGlobalProperties: false,
+        }
+    }
     const availableProperties = [
-        'getPermission',
-        'setPermission',
-        'initEnforcer',
-        'getEnforcerDataFromSvr',
-        'setUser',
-        'can',
-        'cannot',
-        'canAll',
-        'canAny',
+        'addPolicy',
+        'removePolicy',
+        'enforceEx',
+        'updatePolicy'
     ];
 
-    app.provide(AUTHORIZER_KEY, authorizer);
+    app.provide(AUTHORIZER_KEY, enforcer);
 
-    if (!authorizer || !(authorizer instanceof Authorizer)) {
-        throw new Error('Please provide an authorizer instance to plugin.');
+    if (!Enforcer || !(enforcer instanceof Enforcer)) {
+        throw new Error('Please provide an enforcer instance to plugin.');
     }
 
     if (options) {
-        // I cannot implement this because of the limitation of Vue.
-        // If you have any idea, plz tell me.
-        //
-        // TODO: add autoload option when Authorizer in 'auto' mode is given.
-        //
-        // if (options.autoload) {
-        //   if (authorizer.mode!=='auto'){
-        //     throw new Error('autoload will only work on auto mode Authorizer. You don\'t need this.')
-        //   }
-        //
-        //   if (!(options.autoload instanceof String)) {
-        //     throw new Error('autoload option should have argument username:string')
-        //   }
-        //
-        //   authorizer.setUser(options.autoload)
-        // }
-
         if (options.useGlobalProperties) {
-            app.config.globalProperties.$authorizer = authorizer;
+            app.config.globalProperties.$enforcer = enforcer;
 
             if (options.customProperties) {
                 const targetProperties = availableProperties.filter((property: string) => {
@@ -53,8 +36,7 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
                 });
 
                 targetProperties.forEach((propertyStr: string) => {
-
-                    const property = Object.getPrototypeOf(authorizer)[propertyStr]
+                    const property = Object.getPrototypeOf(enforcer)[propertyStr]
                     if (property) {
                         const propertyKey = `$${propertyStr}`
                         // app.config.globalProperties[propertyKey] = property;
@@ -69,7 +51,22 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
                     }
                 });
             } else {
-                app.config.globalProperties.$can = authorizer.can;
+                app.config.globalProperties.$enforce = enforcer.enforce;
+                app.config.globalProperties.$enforce.add = async function (p){
+                    if(typeof p[0] === 'string'){
+                        return await enforcer.addPolicy(...p);
+                    }
+                    return await enforcer.addPolicies(p);
+                }
+                app.config.globalProperties.$enforce.remove = async function (p){
+                    if(typeof p[0] === 'string'){
+                        return await enforcer.removePolicy(...p);
+                    }
+                    return await enforcer.removePolicies(p);
+                }
+                app.config.globalProperties.$enforce.update = async function (oldp,newp){
+                        return await enforcer.updatePolicy(oldp,newp);
+                }
             }
         }
     }
