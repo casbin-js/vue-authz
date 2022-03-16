@@ -1,12 +1,12 @@
 {
   "name": "vue-authz",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "repository": "https://github.com/Zxilly/vue-casbin.git",
+  "repository": "https://github.com/casbin-js/vue-authz.git",
   "author": {
     "name": "Zxilly",
-    "email": "zhouxinyu1001@gmail.com",
+    "email": "zxilly@outlook.com",
     "url": "https://learningman.top"
   },
   "license": "Apache-2.0",
