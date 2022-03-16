@@ -1,111 +1,105 @@
-import { Authorizer } from 'casbin.js';
-import { defineComponent, createApp } from 'vue';
-import { AUTHORIZER_KEY, useAuthorizer } from '../useAuthorizer';
-import { basicModelStr } from './util';
-import plugin from '../index';
+/**
+ * @jest-environment jsdom
+ */
 
-const respData = JSON.stringify({
-    m: basicModelStr,
-    p: [
-        ['p', 'alice', 'data1', 'read'],
-        ['p', 'alice', 'data2', 'write'],
-    ],
-});
+import { defineComponent, createApp } from 'vue';
+import { ENFORCER_KEY } from '../useEnforcer';
+import plugin from '../index';
+import { getEnforcer } from './util';
 
 describe('Enforcer plugin test', () => {
-    let authorizer;
     let vm;
     let app;
     let appRoot;
+    let enforcer;
 
     const App = defineComponent({
         inject: {
-            authorizer: {
+            enforcer: {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                from: AUTHORIZER_KEY,
+                from: ENFORCER_KEY,
             },
         },
         render() {
-            return this.authorizer.can('write', 'data2');
+            return null;
         },
     });
 
-    beforeEach(async () => {
-        authorizer = new Authorizer('auto', { endpoint: 'something' });
-        await authorizer.initEnforcer(respData);
-        authorizer.user = 'alice';
-        appRoot = window.document.createElement('div');
+    beforeAll(async () => {
+        enforcer = await getEnforcer();
     });
 
-    it('Throw Error when authorizer is not provided.', () => {
-        // @ts-ignore
-        expect(() => createApp().use(plugin)).toThrowError('Please provide an authorizer instance to plugin.');
+    beforeEach(() => {
+        appRoot = document.createElement('div');
     });
 
-    it('Throw Error when fake authorizer is provided.', () => {
-        // @ts-ignore
-        expect(() => createApp().use(plugin, {})).toThrowError('Please provide an authorizer instance to plugin.');
+    describe('error init', () => {
+        it('Throw Error when enforcer is not provided.', () => {
+            expect(() => createApp({}).use(plugin)).toThrowError('Please provide an enforcer instance to plugin.');
+        });
+
+        it('Throw Error when invalid enforcer is provided.', () => {
+            expect(() => createApp({}).use(plugin, {})).toThrowError('Please provide an enforcer instance to plugin.');
+        });
     });
 
     describe('by default', () => {
         beforeEach(() => {
-            app = createApp(App).use(plugin, authorizer);
+            app = createApp(App).use(plugin, enforcer);
             vm = app.mount(appRoot);
         });
 
         it('should not have globalProperties', () => {
-            expect(vm.$authorizer).toBeFalsy();
-            expect(vm.$can).toBeFalsy();
+            expect(vm.$enforcer).toBeFalsy();
+            expect(vm.$enforce).toBeFalsy();
         });
 
-        it('should have authorizer', function () {
-            expect(vm.authorizer).toEqual(authorizer);
+        it('should have enforcer', function () {
+            expect(vm.enforcer).toEqual(enforcer);
         });
     });
 
     describe('when use useGlobalProperties option', () => {
         beforeEach(() => {
-            app = createApp(App).use(plugin, authorizer, {
+            app = createApp(App).use(plugin, enforcer, {
                 useGlobalProperties: true,
             });
             vm = app.mount(appRoot);
         });
 
         it('should have globalProperties', () => {
-            expect(vm.$authorizer).toBeDefined();
-            expect(vm.$can).toBeDefined();
+            expect(vm.$enforcer).toBeDefined();
+            expect(vm.$enforce).toBeDefined();
         });
 
         it('should have authorizer', function () {
-            expect(vm.authorizer).toEqual(authorizer);
+            expect(vm.enforcer).toEqual(enforcer);
         });
     });
 
     describe('when use customProperties option', () => {
         function addCustomApp(apiInNeed: string[]) {
-            app = createApp(App).use(plugin, authorizer, {
+            app = createApp(App).use(plugin, enforcer, {
                 useGlobalProperties: true,
                 customProperties: apiInNeed,
             });
             vm = app.mount(appRoot);
         }
 
-        it("should have 'can' and 'cannot'", function() {
-            addCustomApp(['can','cannot'])
+        it("should have 'enforceEx' and 'enforceSync'", function () {
+            addCustomApp(['enforceEx', 'enforceSync']);
 
-            expect(vm.$can).toBeDefined()
-            expect(vm.$cannot).toBeDefined()
-            expect(vm.$authorizer).toBeDefined()
+            expect(vm.$enforcer).toBeDefined();
+            expect(vm.$enforce).toBeUndefined();
+            expect(vm.$enforceEx).toBeDefined();
+            expect(vm.$enforceSync).toBeDefined();
         });
 
-        it("should have 'can', 'cannot', 'canAll' and 'canAny'", function() {
-            addCustomApp(['can','cannot','canAll','canAny'])
-
-            expect(vm.$can).toBeDefined()
-            expect(vm.$cannot).toBeDefined()
-            expect(vm.$canAll).toBeDefined()
-            expect(vm.$canAny).toBeDefined()
-            expect(vm.$authorizer).toBeDefined()
+        it('should throw error when met invalid property', function () {
+            expect(() => {
+                addCustomApp(['invalid']);
+            }).toThrowError('Invalid property: invalid');
         });
     });
 });

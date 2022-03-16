@@ -1,6 +1,6 @@
 # vue-authz
 
-This package allows you to integrate [Casbin.js](https://github.com/casbin/casbin.js) (An authorization library) with
+This package allows you to integrate [Casbin](https://github.com/casbin/node-casbin) (An authorization library) with
 your Vue 3 application.
 
 ## Installation
@@ -23,88 +23,79 @@ new [Vue Composition API](https://v3.vuejs.org/guide/composition-api-introductio
 ```typescript
 import { createApp } from 'vue';
 import CasbinPlugin from 'vue-authz';
-import { Authorizer } from 'casbin.js';
+import { newEnforcer } from 'casbin';
 
-const permission = {
-    "read": ['data1', 'data2'],
-    "write": ['data1']
-}
-
-// Run casbin.js in manual mode, which requires you to set the permission manually.
-const authorizer = new casbinjs.Authorizer("manual");
-
-authorizer.setPermission(permission);
+const enforcer = newEnforcer('model string', 'policy string');
 
 createApp()
-    .use(CasbinPlugin, authorizer, {
-        useGlobalProperties: true
-    }).mount('#app');
+  .use(CasbinPlugin, enforcer, {
+    useGlobalProperties: true
+  }).mount('#app');
 ```
 
-After that, you can use `$authorizer` and `$can` in every component.
+After that, you can use `$enforcer` and `$enforceSync` in every component.
 
 ```vue
 
 <template>
-    <p
-        v-if='$can("read","post")'
-    >
-        Post content.
-    </p>
+  <p
+    v-if='$enforceSync("alice","read","post")'
+  >
+    Post content.
+  </p>
 </template>
 ```
 
-`useGlobalProperties` will mount `$can` and `$authorizer` on every component. Sometimes, you may want to use some other
-function as `$can`. In this condition, you can
-use [provide/inject API](https://v3.vuejs.org/guide/component-provide-inject.html) in Vue 3 to get the `$authorizer`.
+By default, `useGlobalProperties` will mount `$enforcer` and `$enforce` on every component. You can also
+use [provide/inject API](https://v3.vuejs.org/guide/component-provide-inject.html) in Vue 3 to get the `enforcer`.
 
 ```typescript
 createApp()
-    .use(CasbinPlugin, authorizer)
-    .mount('#app');
+  .use(CasbinPlugin, enforcer)
+  .mount('#app');
 ```
 
-And inject it with `AUTHORIZER_KEY`
+And inject it with `ENFORCER_KEY`
 
 ```vue
 
 <template>
-    <p v-if="$whatyouwant.can('read', 'Post')">
-        Post content.
-    </p>
+  <p v-if="$whatyouwant.enforceSync('alice', 'read', 'Post')">
+    Post content.
+  </p>
 </template>
 
 <script>
-import { AUTHORIZER_KEY } from 'vue-authz';
+import { ENFORCER_KEY } from 'vue-authz';
 
 export default {
-    inject: {
-        $whatyouwant: { from: AUTHORIZER_KEY }
-    }
+  inject: {
+    $whatyouwant: { from: ENFORCER_KEY }
+  }
 }
 </script>
 ```
 
-You can also use `useAuthorizer` function.
+You can also use `useEnforcer` function.
 
 ```vue
 
 <template>
-    <p v-if="whatyouwant.can('read', 'Post')">
-        Post content.
-    </p>
+  <p v-if="whatyouwant.enforceSync('read', 'Post')">
+    Post content.
+  </p>
 </template>
 
 <script>
-import { useAuthorizer } from 'vue-authz';
+import { useEnforcer } from 'vue-authz';
 
 export default {
-    setup() {
-        const { whatyouwant } = useAuthorizer();
-        return {
-            whatyouwant
-        };
-    }
+  setup() {
+    const { whatyouwant } = useEnforcer();
+    return {
+      whatyouwant
+    };
+  }
 }
 </script>
 ```
@@ -118,5 +109,6 @@ This project is licensed under the [Apache 2.0 license](LICENSE).
 If you have any issues or feature requests, please contact us. PR is welcomed.
 
 - https://github.com/casbin.js/vue-authz/issues
-- hsluoyz@gmail.com
-- Tencent QQ group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)
+- zxilly@outlook.com
+- Tencent QQ
+  group: [546057381](//shang.qq.com/wpa/qunwpa?idkey=8ac8b91fc97ace3d383d0035f7aa06f7d670fd8e8d4837347354a31c18fac885)

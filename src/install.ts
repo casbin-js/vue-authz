@@ -1,75 +1,40 @@
 import { App } from 'vue';
-import { Authorizer } from 'casbin.js';
-import { AUTHORIZER_KEY } from './useAuthorizer';
+import { Enforcer } from 'casbin';
+import { ENFORCER_KEY } from './useEnforcer';
 
 export interface CasbinPluginOptions {
     useGlobalProperties?: boolean;
     customProperties?: Array<string>;
 }
 
-const install = function (app: App, authorizer: Authorizer, options?: CasbinPluginOptions) {
-    const availableProperties = [
-        'getPermission',
-        'setPermission',
-        'initEnforcer',
-        'getEnforcerDataFromSvr',
-        'setUser',
-        'can',
-        'cannot',
-        'canAll',
-        'canAny',
-    ];
+const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOptions) {
+    app.provide(ENFORCER_KEY, enforcer);
 
-    app.provide(AUTHORIZER_KEY, authorizer);
-
-    if (!authorizer || !(authorizer instanceof Authorizer)) {
-        throw new Error('Please provide an authorizer instance to plugin.');
+    if (!enforcer || !(enforcer instanceof Enforcer)) {
+        throw new Error('Please provide an enforcer instance to plugin.');
     }
 
     if (options) {
-        // I cannot implement this because of the limitation of Vue.
-        // If you have any idea, plz tell me.
-        //
-        // TODO: add autoload option when Authorizer in 'auto' mode is given.
-        //
-        // if (options.autoload) {
-        //   if (authorizer.mode!=='auto'){
-        //     throw new Error('autoload will only work on auto mode Authorizer. You don\'t need this.')
-        //   }
-        //
-        //   if (!(options.autoload instanceof String)) {
-        //     throw new Error('autoload option should have argument username:string')
-        //   }
-        //
-        //   authorizer.setUser(options.autoload)
-        // }
-
         if (options.useGlobalProperties) {
-            app.config.globalProperties.$authorizer = authorizer;
+            app.config.globalProperties.$enforcer = enforcer;
 
-            if (options.customProperties) {
-                const targetProperties = availableProperties.filter((property: string) => {
-                    return (options.customProperties as string[]).indexOf(property) !== -1;
-                });
-
-                targetProperties.forEach((propertyStr: string) => {
-
-                    const property = Object.getPrototypeOf(authorizer)[propertyStr]
+            if (options.customProperties != null) {
+                options.customProperties.forEach((propertyStr: string) => {
+                    const property = Object.getPrototypeOf(enforcer)[propertyStr];
                     if (property) {
-                        const propertyKey = `$${propertyStr}`
-                        // app.config.globalProperties[propertyKey] = property;
-                        Object.defineProperty(app.config.globalProperties,propertyKey,{
+                        const propertyKey = `$${propertyStr}`;
+                        Object.defineProperty(app.config.globalProperties, propertyKey, {
                             enumerable: true,
                             configurable: true,
                             writable: true,
-                            value: property
-                        })
+                            value: property,
+                        });
                     } else {
-                        throw new Error('Unexpected Error.');
+                        throw new Error(`Invalid property: ${propertyStr}`);
                     }
                 });
             } else {
-                app.config.globalProperties.$can = authorizer.can;
+                app.config.globalProperties.$enforce = enforcer.enforceSync;
             }
         }
     }

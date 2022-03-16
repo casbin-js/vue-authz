@@ -1,5 +1,5 @@
 export { install } from './install';
-export * from './useAuthorizer';
+export * from './useEnforcer';
 
 import { install } from './install';
 
