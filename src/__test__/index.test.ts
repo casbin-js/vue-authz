@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import { defineComponent, createApp } from 'vue';
 import { ENFORCER_KEY } from '../useEnforcer';
 import plugin from '../index';

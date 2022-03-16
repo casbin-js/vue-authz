@@ -4,7 +4,7 @@ import { ENFORCER_KEY } from './useEnforcer';
 
 export interface CasbinPluginOptions {
     useGlobalProperties?: boolean;
-    customProperties?: Array<string>;
+    customProperties?: string[];
 }
 
 const install = function (app: App, enforcer: Enforcer, options?: CasbinPluginOptions) {
