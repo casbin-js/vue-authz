@@ -25,7 +25,7 @@
     "@types/js-cookie": "^2.2.6",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
-    "casbin": "^5.1.2",
+    "casbin": "^5.8.0",
     "clean-webpack-plugin": "^3.0.0",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
@@ -49,6 +49,6 @@
     "@babel/preset-env": "^7.11.0",
     "axios": "^0.21.1",
     "babel-loader": "^8.1.0",
-    "casbin.js": "^0.1.0"
+    "casbin.js": "^0.4.1"
   }
 }
