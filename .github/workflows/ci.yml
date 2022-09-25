@@ -18,11 +18,11 @@ jobs:
       - run: yarn install
       - run: yarn lint
       - run: yarn test
-      # - run: yarn coverage
+      - run: yarn coverage
       - run: yarn build
 
-      # - name: Codecov
-      #   uses: codecov/codecov-action@v1
+      - name: Codecov
+        uses: codecov/codecov-action@v1
 
   semantic-release:
     needs: [ build-and-test ]

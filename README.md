@@ -3,6 +3,7 @@
 [![NPM version][npm-image]][npm-url]
 [![NPM download][download-image]][download-url]
 [![CI](https://github.com/casbin-js/vue-authz/actions/workflows/ci.yml/badge.svg)](https://github.com/casbin-js/vue-authz/actions/workflows/ci.yml)
+[![Coverage Status](https://codecov.io/gh/casbin-js/vue-authz/branch/master/graph/badge.svg)](https://codecov.io/gh/casbin-js/vue-authz?branch=master)
 
 [npm-image]: https://img.shields.io/npm/v/vue-authz.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/vue-authz
