@@ -1,5 +1,15 @@
 # vue-authz
 
+[![NPM version][npm-image]][npm-url]
+[![NPM download][download-image]][download-url]
+[![CI](https://github.com/casbin-js/vue-authz/actions/workflows/ci.yml/badge.svg)](https://github.com/casbin-js/vue-authz/actions/workflows/ci.yml)
+[![Coverage Status](https://codecov.io/gh/casbin-js/vue-authz/branch/master/graph/badge.svg)](https://codecov.io/gh/casbin-js/vue-authz?branch=master)
+
+[npm-image]: https://img.shields.io/npm/v/vue-authz.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/vue-authz
+[download-image]: https://img.shields.io/npm/dm/vue-authz.svg?style=flat-square
+[download-url]: https://www.npmjs.com/package/vue-authz
+
 This package allows you to integrate [Casbin.js](https://github.com/casbin/casbin.js) (An authorization library) with
 your Vue 3 application.
 

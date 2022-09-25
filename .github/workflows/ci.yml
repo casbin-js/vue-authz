@@ -1,0 +1,37 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ ^12, ^14, ^16 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: yarn install
+      - run: yarn lint
+      - run: yarn test
+      - run: yarn coverage
+      - run: yarn build
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+
+  semantic-release:
+    needs: [ build-and-test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run semantic-release
+        if: github.repository == 'casbin-js/vue-authz' && github.event_name == 'push'
+        run: yarn install && yarn semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
