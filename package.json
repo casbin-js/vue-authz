@@ -15,9 +15,9 @@
     "lint": "yarn eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "build": "rimraf lib && tsc",
     "test": "jest --config jestconfig.json --unhandled-rejections=strict",
+    "coverage": "jest --config jestconfig.json --coverage",
     "prod": "webpack --config webpack.prod.js",
-    "dev": "webpack --config webpack.dev.js",
-    "coverage": "jest --coverage"
+    "dev": "webpack --config webpack.dev.js"
   },
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.11.0",
@@ -45,7 +45,7 @@
     "ts-jest": "^26.1.0",
     "ts-loader": "^8.0.2",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.9.6",
+    "typescript": "^4.8.3",
     "vue": "^3.0.7",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
