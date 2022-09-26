@@ -19,8 +19,11 @@ describe('Enforcer plugin test', () => {
     let appRoot;
 
     const App = defineComponent({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         inject: {
             authorizer: {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 from: AUTHORIZER_KEY,
             },
@@ -38,11 +41,13 @@ describe('Enforcer plugin test', () => {
     });
 
     it('Throw Error when authorizer is not provided.', () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         expect(() => createApp().use(plugin)).toThrowError('Please provide an authorizer instance to plugin.');
     });
 
     it('Throw Error when fake authorizer is provided.', () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         expect(() => createApp().use(plugin, {})).toThrowError('Please provide an authorizer instance to plugin.');
     });
@@ -90,22 +95,22 @@ describe('Enforcer plugin test', () => {
             vm = app.mount(appRoot);
         }
 
-        it("should have 'can' and 'cannot'", function() {
-            addCustomApp(['can','cannot'])
+        it("should have 'can' and 'cannot'", function () {
+            addCustomApp(['can', 'cannot']);
 
-            expect(vm.$can).toBeDefined()
-            expect(vm.$cannot).toBeDefined()
-            expect(vm.$authorizer).toBeDefined()
+            expect(vm.$can).toBeDefined();
+            expect(vm.$cannot).toBeDefined();
+            expect(vm.$authorizer).toBeDefined();
         });
 
-        it("should have 'can', 'cannot', 'canAll' and 'canAny'", function() {
-            addCustomApp(['can','cannot','canAll','canAny'])
+        it("should have 'can', 'cannot', 'canAll' and 'canAny'", function () {
+            addCustomApp(['can', 'cannot', 'canAll', 'canAny']);
 
-            expect(vm.$can).toBeDefined()
-            expect(vm.$cannot).toBeDefined()
-            expect(vm.$canAll).toBeDefined()
-            expect(vm.$canAny).toBeDefined()
-            expect(vm.$authorizer).toBeDefined()
+            expect(vm.$can).toBeDefined();
+            expect(vm.$cannot).toBeDefined();
+            expect(vm.$canAll).toBeDefined();
+            expect(vm.$canAny).toBeDefined();
+            expect(vm.$authorizer).toBeDefined();
         });
     });
 });
