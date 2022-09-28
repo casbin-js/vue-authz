@@ -1,13 +1,13 @@
-import { App } from 'vue';
 import { Authorizer } from 'casbin.js';
 import { AUTHORIZER_KEY } from './useAuthorizer';
+import { isVue3 } from 'vue-demi';
 
 export interface CasbinPluginOptions {
     useGlobalProperties?: boolean;
     customProperties?: Array<string>;
 }
 
-const install = function (app: App, authorizer: Authorizer, options?: CasbinPluginOptions) {
+const install = function (app, authorizer: Authorizer, options?: CasbinPluginOptions) {
     const availableProperties = [
         'getPermission',
         'setPermission',
@@ -45,7 +45,8 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
         // }
 
         if (options.useGlobalProperties) {
-            app.config.globalProperties.$authorizer = authorizer;
+            const vueProperty = isVue3 ? app.config.globalProperties : app.prototype;
+            vueProperty.$authorizer = authorizer;
 
             if (options.customProperties) {
                 const targetProperties = availableProperties.filter((property: string) => {
@@ -58,7 +59,7 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
                     if (property) {
                         const propertyKey = `$${propertyStr}`
                         // app.config.globalProperties[propertyKey] = property;
-                        Object.defineProperty(app.config.globalProperties,propertyKey,{
+                        Object.defineProperty(vueProperty, propertyKey, {
                             enumerable: true,
                             configurable: true,
                             writable: true,
@@ -69,7 +70,7 @@ const install = function (app: App, authorizer: Authorizer, options?: CasbinPlug
                     }
                 });
             } else {
-                app.config.globalProperties.$can = authorizer.can;
+                vueProperty.$can = authorizer.can;
             }
         }
     }
