@@ -1,4 +1,4 @@
-import { inject, provide, InjectionKey } from 'vue';
+import { inject, provide, InjectionKey } from 'vue-demi';
 import { Authorizer } from 'casbin.js';
 
 const AUTHORIZER_KEY: InjectionKey<Authorizer> = Symbol('casbinjs_authorizer');
